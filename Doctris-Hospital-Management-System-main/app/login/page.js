@@ -99,6 +99,7 @@ const LoginPage = () => {
         <form onSubmit={handleSubmit} className='space-y-5'>
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
+            <div className="relative">
               <EnvelopeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 text-slate-400 pointer-events-none" />
               <input
                 type='email'
@@ -109,10 +110,12 @@ const LoginPage = () => {
                 required
                 className='input-field input-with-icon'
               />
+            </div>
           </div>
 
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
+            <div className="relative">
               <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 text-slate-400 pointer-events-none" />
               <input
                 type='password'
@@ -123,6 +126,7 @@ const LoginPage = () => {
                 required
                 className='input-field input-with-icon'
               />
+            </div>
           </div>
 
           <div className="flex justify-end">
