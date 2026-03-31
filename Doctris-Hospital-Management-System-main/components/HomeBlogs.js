@@ -32,7 +32,7 @@ const featuredArticles = [
 
 const HomeBlogs = () => {
   return (
-    <div className="px-6 md:px-12 lg:px-24 pb-24 bg-white">
+    <div className="px-6 md:px-12 lg:px-24 pb-24 transition-colors duration-300" style={{ backgroundColor: 'var(--bg)' }}>
       <HomeSectionHeader
         tag="Insights"
         title="Latest Health Articles"
@@ -58,15 +58,15 @@ const HomeBlogs = () => {
             </div>
 
             <div className="p-7 flex flex-col flex-grow">
-              <div className="flex items-center gap-3 mb-4 text-xs text-slate-400 font-medium">
+              <div className="flex items-center gap-3 mb-4 text-xs font-medium" style={{ color: 'var(--text-light)' }}>
                 <span>{blog.date}</span>
                 <span>·</span>
                 <span>{blog.readTime}</span>
               </div>
-              <h3 className="font-bold text-xl text-slate-900 leading-tight mb-3 group-hover:text-blue-600 transition-colors">
+              <h3 className="font-bold text-xl leading-tight mb-3 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text)' }}>
                 {blog.title}
               </h3>
-              <p className="text-slate-500 text-sm leading-relaxed flex-grow">
+              <p className="text-sm leading-relaxed flex-grow" style={{ color: 'var(--text-muted)' }}>
                 {blog.excerpt}
               </p>
 

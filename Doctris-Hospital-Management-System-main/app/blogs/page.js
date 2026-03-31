@@ -37,7 +37,7 @@ const HomeBlogs = () => {
             </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-16 perspective-1000">
           {loading ? (
             [1, 2, 3].map((i) => (
               <div key={i} className="bg-white rounded-[32px] p-4 border border-slate-100 shadow-sm space-y-4">

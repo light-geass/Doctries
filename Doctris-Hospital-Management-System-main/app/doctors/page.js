@@ -1,9 +1,12 @@
+"use client";
+
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDoctors } from "@/features/doctors/doctorsSlice";
 import { addNotification } from "@/features/ui/uiSlice";
 import Skeleton from "@/components/Skeleton";
 import Link from "next/link";
-import { MagnifyingGlassIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon, FunnelIcon } from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+import { MagnifyingGlassIcon, MapPinIcon, PhoneIcon, EnvelopeIcon, ClockIcon } from "@heroicons/react/24/outline";
 
 export default function DoctorsPage() {
   const dispatch = useDispatch();
@@ -57,52 +60,75 @@ export default function DoctorsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-8 lg:px-16">
+    <div className="min-h-screen py-12 px-4 sm:px-8 lg:px-16 transition-colors duration-300" style={{ backgroundColor: 'var(--bg)' }}>
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-10">
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Find a Doctor</h1>
-          <p className="mt-3 text-slate-500 max-w-xl mx-auto">
-            Search by name, specialty, or location. Get instant directions to their clinic via Google Maps.
+        <div className="text-center mb-12">
+          <span className="inline-block text-xs font-bold text-cyan-500 tracking-widest uppercase mb-3">
+            ✨ Find A Specialist
+          </span>
+          <h1 className="text-5xl font-extrabold tracking-tight mb-2" style={{ color: 'var(--text)' }}>
+            Your Doctor,
+          </h1>
+          <h2 className="text-5xl font-extrabold bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent mb-4">
+            Near You
+          </h2>
+          <p className="mt-4 max-w-2xl mx-auto text-lg" style={{ color: 'var(--text-muted)' }}>
+            Search by name, specialty, or location. Get instant directions via Google Maps.
           </p>
         </div>
 
         {/* Search + Filter Bar */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-10 max-w-3xl mx-auto">
-          <div className="flex-1 relative">
-            <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+        <div className="flex flex-col lg:flex-row gap-4 mb-8 max-w-4xl mx-auto items-center">
+          <div className="flex-1 w-full relative">
+            <MagnifyingGlassIcon className="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--text-light)' }} />
             <input
               type="text"
               placeholder="Search doctors, specialties, or locations..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 rounded-xl border border-slate-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 outline-none text-sm transition-all"
+              className="input-field pl-12 pr-4 py-3 rounded-xl"
             />
           </div>
-          <div className="relative">
-            <FunnelIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <select
-              value={selectedSpecialty}
-              onChange={(e) => setSelectedSpecialty(e.target.value)}
-              className="pl-9 pr-8 py-3 rounded-xl border border-slate-200 bg-white shadow-sm focus:ring-2 focus:ring-blue-500/50 focus:border-blue-400 outline-none text-sm appearance-none cursor-pointer min-w-[180px]"
+          <select
+            value={selectedSpecialty}
+            onChange={(e) => setSelectedSpecialty(e.target.value)}
+            className="input-field px-4 py-3 rounded-xl appearance-none cursor-pointer min-w-[160px]"
+          >
+            {specialties.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Specialty Pills */}
+        <div className="flex flex-wrap gap-2 mb-8 max-w-4xl mx-auto">
+          {specialties.map((spec) => (
+            <button
+              key={spec}
+              onClick={() => setSelectedSpecialty(spec)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                selectedSpecialty === spec
+                  ? "bg-cyan-500 text-white shadow-lg shadow-cyan-500/30"
+                  : ""
+              }`}
+              style={selectedSpecialty !== spec ? { backgroundColor: 'var(--surface-2)', color: 'var(--text-muted)' } : {}}
             >
-              {specialties.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
-          </div>
+              {spec}
+            </button>
+          ))}
         </div>
 
         {/* Results Count */}
-        <p className="text-sm text-slate-500 mb-6">
-          Showing <span className="font-bold text-slate-700">{filteredDoctors.length}</span> doctor{filteredDoctors.length !== 1 ? "s" : ""}
+        <p className="text-sm mb-8" style={{ color: 'var(--text-muted)' }}>
+          Showing <span className="font-bold" style={{ color: 'var(--text)' }}>{filteredDoctors.length}</span> doctor{filteredDoctors.length !== 1 ? "s" : ""}
         </p>
 
         {/* Doctor Cards Grid */}
         {loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="bg-white rounded-2xl border border-slate-200 p-6 space-y-4">
+              <div key={i} className="card rounded-2xl p-6 space-y-4">
                 <div className="flex gap-4">
                   <Skeleton className="w-16 h-16 rounded-full" />
                   <div className="flex-1 space-y-2">
@@ -111,7 +137,6 @@ export default function DoctorsPage() {
                   </div>
                 </div>
                 <div className="space-y-3 pt-4">
-                  <Skeleton className="w-full h-4 rounded-md" />
                   <Skeleton className="w-full h-4 rounded-md" />
                   <Skeleton className="w-full h-4 rounded-md" />
                 </div>
@@ -127,7 +152,7 @@ export default function DoctorsPage() {
             {filteredDoctors.map((doc) => (
               <div
                 key={doc.id}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
+                className="card rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden group"
               >
                 {/* Card Header */}
                 <div className="p-6 pb-4">
@@ -137,9 +162,9 @@ export default function DoctorsPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <Link href={`/doctors/${doc.id}`} className="block">
-                        <h3 className="text-lg font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate">{doc.name}</h3>
+                        <h3 className="text-lg font-bold group-hover:text-blue-600 transition-colors truncate" style={{ color: 'var(--text)' }}>{doc.name}</h3>
                       </Link>
-                      <span className="inline-block px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold mt-1">
+                      <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold mt-1" style={{ background: 'rgba(37, 99, 235, 0.1)', color: '#60a5fa' }}>
                         {doc.specialization}
                       </span>
                     </div>
@@ -147,23 +172,23 @@ export default function DoctorsPage() {
                 </div>
 
                 {/* Info Section */}
-                <div className="px-6 space-y-3 text-sm">
-                  <div className="flex items-start gap-2.5 text-slate-600">
+                <div className="px-6 space-y-3 text-sm" style={{ color: 'var(--text-muted)' }}>
+                  <div className="flex items-start gap-2.5">
                     <MapPinIcon className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
                     <span className="line-clamp-2">{doc.location}</span>
                   </div>
-                  <div className="flex items-center gap-2.5 text-slate-600">
+                  <div className="flex items-center gap-2.5">
                     <ClockIcon className="w-4 h-4 text-amber-500 shrink-0" />
                     <span className="truncate">{doc.availability}</span>
                   </div>
                   {doc.phone && (
-                    <div className="flex items-center gap-2.5 text-slate-600">
+                    <div className="flex items-center gap-2.5">
                       <PhoneIcon className="w-4 h-4 text-emerald-500 shrink-0" />
                       <a href={`tel:${doc.phone}`} className="hover:text-blue-600 transition-colors">{doc.phone}</a>
                     </div>
                   )}
                   {doc.email && (
-                    <div className="flex items-center gap-2.5 text-slate-600">
+                    <div className="flex items-center gap-2.5">
                       <EnvelopeIcon className="w-4 h-4 text-indigo-400 shrink-0" />
                       <a href={`mailto:${doc.email}`} className="hover:text-blue-600 transition-colors truncate">{doc.email}</a>
                     </div>
@@ -181,7 +206,8 @@ export default function DoctorsPage() {
                   </button>
                   <Link
                     href={`/doctors/${doc.id}`}
-                    className="flex items-center justify-center px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-sm font-bold hover:bg-slate-200 transition-colors"
+                    className="flex items-center justify-center px-4 py-2.5 rounded-xl text-sm font-bold transition-colors"
+                    style={{ backgroundColor: 'var(--surface-2)', color: 'var(--text-muted)' }}
                   >
                     View Profile
                   </Link>
@@ -192,8 +218,8 @@ export default function DoctorsPage() {
         ) : (
           <div className="text-center py-20">
             <div className="text-5xl mb-4">🔍</div>
-            <h3 className="text-xl font-bold text-slate-700 mb-2">No doctors found</h3>
-            <p className="text-slate-500">Try adjusting your search or filter criteria.</p>
+            <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--text)' }}>No doctors found</h3>
+            <p style={{ color: 'var(--text-muted)' }}>Try adjusting your search or filter criteria.</p>
           </div>
         )}
       </div>

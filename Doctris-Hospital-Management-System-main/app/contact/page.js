@@ -1,5 +1,3 @@
-import HomeSectionHeader from '@/components/HomeSectionHeader'
-import HomeServices2 from '@/components/HomeServices2'
 import React from 'react'
 import { FaPhone } from "react-icons/fa6";
 import { MdEmail } from "react-icons/md";
@@ -9,47 +7,82 @@ import { FaLocationDot } from "react-icons/fa6";
 const Contact = () => {
   return (
     <div>
-      <HomeSectionHeader title="Contact Us" description="Great doctor if you need your family member to get effective immediate assistance, emergency treatment or a simple consultation." />
+      <div className='px-70 py-16'>
+        <div className='text-center mb-8'>
+          <span className='inline-block text-[12px] font-black text-cyan-500 tracking-[0.2em] uppercase'>GET IN TOUCH</span>
+          <h1 className='text-4xl font-black mt-3 tracking-tight' style={{ color: 'var(--text)' }}>
+            We&apos;re here <span className='bg-gradient-to-r from-cyan-500 to-blue-600 bg-clip-text text-transparent'>to help</span>
+          </h1>
+          <p className='mt-4 max-w-2xl mx-auto font-medium' style={{ color: 'var(--text-muted)' }}>
+            Need help with a scan, finding a doctor, or getting emergency support? Reach out anytime.
+          </p>
+        </div>
+      </div>
       <div className='px-70 grid grid-cols-3 gap-6 text-center mb-20'>
-        <HomeServices2 icon={<FaPhone />} name="Phone" desc="Great doctor if you need your family member to get effective assistance" link="+152 534-468-854" />
-        <HomeServices2 icon={<MdEmail />} name="Email" desc="Great doctor if you need your family member to get effective assistance" link="contact@example.com" />
-        <HomeServices2 icon={<FaLocationDot />} name="Location" desc="Great doctor if you need your family member to get effective assistance" link="View on Google map" />
-
+        <div className='rounded-3xl p-8 shadow-xl group transition-all duration-300' style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className='flex justify-center mb-4'>
+            <div className='p-4 rounded-2xl text-cyan-600 text-2xl group-hover:bg-cyan-500 group-hover:text-white transition-colors duration-500' style={{ background: 'rgba(6, 182, 212, 0.1)' }}>
+              <FaPhone />
+            </div>
+          </div>
+          <h3 className='text-[16px] font-black mb-2 uppercase tracking-wide' style={{ color: 'var(--text)' }}>Call Us Directly</h3>
+          <p className='text-[14px] mb-3 font-medium' style={{ color: 'var(--text-muted)' }}>Available Mon–Sat, 9AM–6PM IST</p>
+          <a href="tel:+152534468854" className='text-blue-600 font-black text-[14px] hover:underline transition-all'>+152 534-468-854</a>
+        </div>
+        <div className='rounded-3xl p-8 shadow-xl group transition-all duration-300' style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className='flex justify-center mb-4'>
+            <div className='p-4 rounded-2xl text-blue-600 text-2xl group-hover:bg-blue-500 group-hover:text-white transition-colors duration-500' style={{ background: 'rgba(37, 99, 235, 0.1)' }}>
+              <MdEmail />
+            </div>
+          </div>
+          <h3 className='text-[16px] font-black mb-2 uppercase tracking-wide' style={{ color: 'var(--text)' }}>Drop a Message</h3>
+          <p className='text-[14px] mb-3 font-medium' style={{ color: 'var(--text-muted)' }}>We respond within 24 hours</p>
+          <a href="mailto:contact@example.com" className='text-blue-600 font-black text-[14px] hover:underline transition-all'>contact@example.com</a>
+        </div>
+        <div className='rounded-3xl p-8 shadow-xl group transition-all duration-300' style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <div className='flex justify-center mb-4'>
+            <div className='p-4 rounded-2xl text-indigo-600 text-2xl group-hover:bg-indigo-500 group-hover:text-white transition-colors duration-500' style={{ background: 'rgba(99, 102, 241, 0.1)' }}>
+              <FaLocationDot />
+            </div>
+          </div>
+          <h3 className='text-[16px] font-black mb-2 uppercase tracking-wide' style={{ color: 'var(--text)' }}>Find Our Office</h3>
+          <p className='text-[14px] mb-3 font-medium' style={{ color: 'var(--text-muted)' }}>RAIT, Navi Mumbai</p>
+          <a href="#map" className='text-blue-600 font-black text-[14px] hover:underline transition-all'>View on Google Maps →</a>
+        </div>
       </div>
       <div className='px-70 grid grid-cols-[2fr_3fr] gap-10 mb-20' >
-        <div className=''>
-          <img src="/about-2.png" alt="" />
+        <div className='rounded-[32px] overflow-hidden shadow-2xl' style={{ border: '1px solid var(--border)' }}>
+          <img src="/about-2.png" alt="Contact" className='w-full h-full object-cover' />
         </div>
-        <div className='shadow-md rounded-sm p-5 h-fit'>
-          <form action="" className='grid gap-3'>
-            <h1 className='text-[17px] font-semibold'>Get in touch!</h1>
-            <div className='grid grid-cols-2 gap-3'>
-              <div className='grid gap-1'>
-                <label htmlFor="" className='text-[14px]'>Your Name*</label>
-                <input type="text" placeholder='Name:' className='border-1 border-[#ebf0fd] text-[13px] px-2 py-1 outline-none rounded-sm' />
+        <div className='rounded-[32px] p-10 h-fit shadow-2xl' style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+          <form className='grid gap-6'>
+            <div>
+              <h2 className='text-2xl font-black mb-1 tracking-tight' style={{ color: 'var(--text)' }}>Send a Message</h2>
+              <p className='font-medium text-[14px]' style={{ color: 'var(--text-muted)' }}>Fill in the form and we&apos;ll get back to you shortly.</p>
+            </div>
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='grid gap-2'>
+                <label htmlFor="name" className='text-[10px] font-black uppercase tracking-widest ml-1' style={{ color: 'var(--text-light)' }}>YOUR NAME</label>
+                <input type="text" id="name" placeholder='Alok Mahadik' className='input-field rounded-xl' />
               </div>
-              <div className='grid gap-1'>
-                <label htmlFor="" className='text-[14px]'>Your Email*</label>
-                <input type="email" placeholder='Email:' className='border-1 border-[#ebf0fd] text-[13px] px-2 py-1 outline-none rounded-sm' />
+              <div className='grid gap-2'>
+                <label htmlFor="email" className='text-[10px] font-black uppercase tracking-widest ml-1' style={{ color: 'var(--text-light)' }}>YOUR EMAIL</label>
+                <input type="email" id="email" placeholder='alok@example.com' className='input-field rounded-xl' />
               </div>
             </div>
-            <div className='grid gap-1'>
-              <label htmlFor="" className='text-[14px]'>Subject:</label>
-              <input type="text" placeholder='Your Subject:' className='border-1 border-[#ebf0fd] text-[13px] px-2 py-1 outline-none rounded-sm' />
+            <div className='grid gap-2'>
+              <label htmlFor="subject" className='text-[10px] font-black uppercase tracking-widest ml-1' style={{ color: 'var(--text-light)' }}>SUBJECT</label>
+              <input type="text" id="subject" placeholder='How can we help?' className='input-field rounded-xl' />
             </div>
-            <div className='grid gap-1'>
-              <label htmlFor="" className='text-[14px]'>Comments *</label>
-              <textarea name="" id="" placeholder='Your Message:' className='border-1 border-[#ebf0fd] text-[13px] px-2 py-1 h-30 outline-none rounded-sm'></textarea>
+            <div className='grid gap-2'>
+              <label htmlFor="message" className='text-[10px] font-black uppercase tracking-widest ml-1' style={{ color: 'var(--text-light)' }}>MESSAGE</label>
+              <textarea id="message" placeholder='Describe your question or issue...' className='input-field h-32 rounded-xl resize-none'></textarea>
             </div>
-            <div className='bg-[#396cf0] px-4 py-2 text-white w-fit rounded-sm text-[14px]'>
-              <button>
-                Send Message
-              </button>
-            </div>
+            <button type="submit" className='bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-4 text-white font-black uppercase tracking-widest rounded-xl hover:shadow-2xl hover:shadow-blue-500/30 transition-all active:scale-95 duration-200 text-sm'>
+              Send Message →
+            </button>
           </form>
         </div>
-
-
       </div>
       <div className='w-full'>
         <iframe

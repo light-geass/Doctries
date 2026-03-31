@@ -14,7 +14,6 @@ export default function AgentChatbot({ scanResult, patientData }) {
   const messagesEndRef = useRef(null);
   const recognitionRef = useRef(null);
 
-  // Auto-scroll to bottom
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -52,7 +51,6 @@ export default function AgentChatbot({ scanResult, patientData }) {
     setIsLoading(true);
 
     try {
-      // Build context payload
       const systemContext = `You are a highly capable AI medical assistant directly talking to a patient. 
 You are currently providing support on the results page for their recent medical scan.
 Here is the patient's data: ${JSON.stringify(patientData || {})}
@@ -64,7 +62,6 @@ Rules:
 3. If asked about treatment, remind them you are an AI and they should consult the recommended specialist.
 4. Keep answers brief (max 2-3 short paragraphs).`;
 
-      // Format previous messages for API
       const apiMessages = [
         { role: "system", content: systemContext },
         ...messages.map(m => ({ role: m.role, content: m.content })),
@@ -92,9 +89,10 @@ Rules:
       
       {/* Chat Window */}
       <div 
-        className={`bg-white w-80 sm:w-96 rounded-2xl shadow-2xl border border-slate-200 overflow-hidden transition-all duration-300 transform origin-bottom-right mb-4 ${
+        className={`w-80 sm:w-96 rounded-2xl shadow-2xl overflow-hidden transition-all duration-300 transform origin-bottom-right mb-4 ${
           isOpen ? 'scale-100 opacity-100 translate-y-0 pointer-events-auto' : 'scale-95 opacity-0 translate-y-4 pointer-events-none'
         }`}
+        style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}
       >
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 flex justify-between items-center text-white">
@@ -111,7 +109,7 @@ Rules:
         </div>
 
         {/* Messages Layout */}
-        <div className="h-80 overflow-y-auto p-4 bg-slate-50 flex flex-col gap-3">
+        <div className="h-80 overflow-y-auto p-4 flex flex-col gap-3" style={{ backgroundColor: 'var(--bg)' }}>
           {messages.map((msg, index) => (
             <div 
               key={index} 
@@ -121,8 +119,9 @@ Rules:
                 className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm leading-relaxed ${
                   msg.role === 'user' 
                     ? 'bg-blue-600 text-white rounded-br-sm' 
-                    : 'bg-white text-slate-700 border border-slate-200 rounded-bl-sm shadow-sm'
+                    : 'rounded-bl-sm shadow-sm'
                 }`}
+                style={msg.role !== 'user' ? { backgroundColor: 'var(--surface)', border: '1px solid var(--border)', color: 'var(--text-muted)' } : {}}
               >
                 {msg.content}
               </div>
@@ -131,10 +130,10 @@ Rules:
           
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-white text-slate-700 border border-slate-200 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex items-center gap-1.5">
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"></div>
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.15s' }}></div>
-                <div className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0.3s' }}></div>
+              <div className="rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm flex items-center gap-1.5" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--text-light)' }}></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--text-light)', animationDelay: '0.15s' }}></div>
+                <div className="w-2 h-2 rounded-full animate-bounce" style={{ backgroundColor: 'var(--text-light)', animationDelay: '0.3s' }}></div>
               </div>
             </div>
           )}
@@ -142,21 +141,23 @@ Rules:
         </div>
 
         {/* Input Area */}
-        <form onSubmit={handleSubmit} className="p-3 bg-white border-t border-slate-100 flex gap-2">
+        <form onSubmit={handleSubmit} className="p-3 flex gap-2" style={{ backgroundColor: 'var(--surface)', borderTop: '1px solid var(--border)' }}>
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about your scan..."
-            className="flex-1 bg-slate-100 text-slate-800 text-sm rounded-full px-4 py-2 border-0 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all placeholder-slate-400"
+            className="flex-1 text-sm rounded-full px-4 py-2 border-0 outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
+            style={{ backgroundColor: 'var(--surface-2)', color: 'var(--text)', placeholderColor: 'var(--text-light)' }}
             disabled={isLoading}
           />
           <button 
             type="button"
             onClick={startListening}
             className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-colors cursor-pointer ${
-              isListening ? 'bg-red-500 text-white animate-pulse' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+              isListening ? 'bg-red-500 text-white animate-pulse' : ''
             }`}
+            style={!isListening ? { backgroundColor: 'var(--surface-2)', color: 'var(--text-muted)' } : {}}
             title="Use Voice Input"
           >
             <MicrophoneIcon className="w-5 h-5" />

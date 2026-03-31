@@ -23,7 +23,7 @@ const BookAppointment = () => {
   };
 
   return (
-    <div className="w-4/10 mx-auto my-10 rounded-lg border border-[#ebf0fd] text-[14px] shadow-md">
+    <div className="w-full max-w-xl mx-auto my-10 rounded-[32px] border border-slate-100 text-[14px] shadow-2xl glass-3d tilt-3d overflow-hidden perspective-1000">
       <h1 className="text-white font-semibold text-center py-3 bg-[#396cf0] rounded-t-lg">
         Clinic Appointment
       </h1>

@@ -2,8 +2,10 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { addNotification } from '@/features/ui/uiSlice'
 import { useRouter } from 'next/navigation'
+import { useDispatch } from 'react-redux'
+import { registerPatient } from '@/features/patients/patientsSlice'
+import { addNotification } from '@/features/ui/uiSlice'
 import { UserIcon, EnvelopeIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
 const RegisterPage = () => {
@@ -56,7 +58,7 @@ const RegisterPage = () => {
 
 
   return (
-    <div className='min-h-screen bg-slate-50 flex flex-col md:flex-row'>
+    <div className='min-h-screen flex flex-col md:flex-row' style={{ backgroundColor: 'var(--bg)' }}>
 
       {/* Left visual panel */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-blue-600 to-cyan-500 text-white flex-col justify-between p-12 relative overflow-hidden">
@@ -100,31 +102,30 @@ const RegisterPage = () => {
           <div className="w-9 h-9 bg-blue-600 rounded-xl flex items-center justify-center">
             <img src="/logo-icon.png" alt="Doctris" className="h-5 w-5 object-contain brightness-0 invert" />
           </div>
-          <span className="text-xl font-bold text-slate-900">Doctris</span>
+          <span className="text-xl font-bold" style={{ color: 'var(--text)' }}>Doctris</span>
         </Link>
 
         <div className="mb-10">
-          <h2 className='text-3xl font-extrabold text-slate-900 tracking-tight'>Create your account</h2>
-          <p className="text-slate-500 mt-2">Start your journey to better health in seconds.</p>
+          <h2 className='text-3xl font-extrabold tracking-tight' style={{ color: 'var(--text)' }}>Create your account</h2>
+          <p className="mt-2" style={{ color: 'var(--text-muted)' }}>Start your journey to better health in seconds.</p>
         </div>
 
-        {message.text && (
-          <div className={`mb-8 p-4 rounded-xl text-sm font-medium border fade-in ${
-            message.type === 'success'
-              ? 'bg-green-50 text-green-700 border-green-100'
-              : 'bg-rose-50 text-rose-700 border-rose-100'
-          }`}>
-            {message.text}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className='space-y-5'>
           <div className='grid grid-cols-2 gap-4'>
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">First Name</label>
               <div className="relative">
-                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-                <input type="text" name="firstName" value={formData.firstName} placeholder='First' onChange={handleChange} required className="input-field pl-11" />
+                <UserIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 text-slate-400 pointer-events-none" />
+                <input 
+                  type="text" 
+                  name="firstName" 
+                  value={formData.firstName} 
+                  placeholder='First' 
+                  onChange={handleChange} 
+                  required 
+                  className="input-field input-with-icon" 
+                />
               </div>
             </div>
             <div className="space-y-1">
@@ -132,20 +133,36 @@ const RegisterPage = () => {
               <input type="text" name="lastName" value={formData.lastName} placeholder='Last' onChange={handleChange} required className="input-field" />
             </div>
           </div>
-
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Email Address</label>
             <div className="relative">
-              <EnvelopeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-              <input type="email" name="email" value={formData.email} placeholder='you@example.com' onChange={handleChange} required className="input-field pl-11" />
+              <EnvelopeIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 text-slate-400 pointer-events-none" />
+              <input 
+                type="email" 
+                name="email" 
+                value={formData.email} 
+                placeholder='you@example.com' 
+                onChange={handleChange} 
+                required 
+                className="input-field input-with-icon" 
+              />
             </div>
           </div>
 
           <div className="space-y-1">
             <label className="text-xs font-bold text-slate-500 uppercase tracking-wider ml-1">Password</label>
             <div className="relative">
-              <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 pointer-events-none" />
-              <input type="password" name="password" value={formData.password} placeholder='Minimum 6 characters' onChange={handleChange} required minLength={6} className="input-field pl-11" />
+              <LockClosedIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 text-slate-400 pointer-events-none" />
+              <input 
+                type="password" 
+                name="password" 
+                value={formData.password} 
+                placeholder='Minimum 6 characters' 
+                onChange={handleChange} 
+                required 
+                minLength={6} 
+                className="input-field input-with-icon" 
+              />
             </div>
           </div>
 
@@ -167,7 +184,7 @@ const RegisterPage = () => {
           </Link>
         </p>
 
-        <div className="mt-12 pt-8 border-t border-slate-100 flex justify-center items-center gap-2 text-xs text-slate-400">
+        <div className="mt-12 pt-8 flex justify-center items-center gap-2 text-xs" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-light)' }}>
           <svg className="w-4 h-4 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
           <span>Secured & powered by</span>
           <span className="font-bold text-slate-500">InsForge</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation"; // app router
+import { useRouter } from "next/navigation";
 import { SlCalender } from "react-icons/sl";
 import { FaRegClock, FaRegHeart, FaRegComment } from "react-icons/fa";
 import { MdKeyboardArrowRight } from "react-icons/md";
@@ -32,7 +32,8 @@ const BlogCards = ({ id, image, date, description, title, author }) => {
   return (
     <div
       onClick={() => router.push(`/blogs/${id}`)}
-      className="shadow-md rounded-xl overflow-hidden cursor-pointer hover:shadow-xl transition "
+      className="shadow-md rounded-xl overflow-hidden cursor-pointer hover:shadow-2xl transition-all duration-300 tilt-3d"
+      style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       <div>
         <img
@@ -43,22 +44,22 @@ const BlogCards = ({ id, image, date, description, title, author }) => {
         />
       </div>
       <div className="p-7 grid gap-2">
-        <div className="flex justify-between text-[13.5px] text-[#8492A6] mt-1">
+        <div className="flex justify-between text-[13.5px] mt-1" style={{ color: 'var(--text-light)' }}>
           <div className="flex gap-1 items-center">
-            <SlCalender className="text-black" />
+            <SlCalender style={{ color: 'var(--text-muted)' }} />
             <span>{formatDate(date)}</span>
           </div>
           <div className="flex gap-1 items-center">
-            <FaRegClock className="text-black" />
+            <FaRegClock style={{ color: 'var(--text-muted)' }} />
             <span>5 min read</span>
           </div>
         </div>
 
-        <div className="text-[16px] text-black font-semibold">{title}</div>
+        <div className="text-[16px] font-semibold" style={{ color: 'var(--text)' }}>{title}</div>
         
 
         <div className="flex justify-between text-[15px] mt-3">
-          <div className="flex gap-7 text-[#8492A6]">
+          <div className="flex gap-7" style={{ color: 'var(--text-light)' }}>
             <div className="flex gap-1 items-center">
               <FaRegHeart />
               <p>33</p>

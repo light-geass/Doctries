@@ -43,7 +43,7 @@ const ResultDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-colors" style={{ backgroundColor: 'var(--bg)' }}>
         <div className="max-w-4xl mx-auto space-y-12">
           <Skeleton className="w-48 h-6 rounded-md" />
           <div className="bg-white rounded-[40px] overflow-hidden border border-slate-100 p-0 shadow-lg">
@@ -64,9 +64,9 @@ const ResultDetailPage = () => {
 
   if (!result && status === "succeeded") {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-8 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center p-8 text-center" style={{ backgroundColor: 'var(--bg)' }}>
         <div className="text-5xl mb-4">🔍</div>
-        <h2 className="text-2xl font-bold text-slate-800 mb-2">Report not found</h2>
+        <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text)' }}>Report not found</h2>
         <Link href="/results" className="text-blue-600 hover:underline font-bold mt-4 flex items-center gap-2">
           <ArrowLeftIcon className="w-4 h-4" /> Back to reports
         </Link>
@@ -77,14 +77,15 @@ const ResultDetailPage = () => {
   const details = result?.details || {};
 
   return (
-    <div className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 transition-colors" style={{ backgroundColor: 'var(--bg)' }}>
       <div className="max-w-4xl mx-auto fade-in">
         
         {/* Navigation */}
         <div className="mb-8">
           <Link 
             href="/results" 
-            className="inline-flex items-center gap-2 font-bold text-slate-500 hover:text-blue-600 transition-colors group"
+            className="inline-flex items-center gap-2 font-bold transition-colors group"
+            style={{ color: 'var(--text-muted)' }}
           >
             <ArrowLeftIcon className="h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Back to All Reports
@@ -92,7 +93,7 @@ const ResultDetailPage = () => {
         </div>
 
         {/* Report Container */}
-        <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
+        <div className="rounded-[40px] shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}>
           
           {/* Top Banner */}
           <div className="bg-slate-900 px-10 py-12 text-white relative overflow-hidden">
@@ -126,7 +127,7 @@ const ResultDetailPage = () => {
             
             {/* Image and Severity Row */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              <div className="relative rounded-3xl overflow-hidden border border-slate-100 bg-slate-50 aspect-square flex items-center justify-center group shadow-sm">
+              <div className="relative rounded-3xl overflow-hidden aspect-square flex items-center justify-center group shadow-sm" style={{ backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)' }}>
                 <img 
                   src={result?.scans?.file_url} 
                   alt="Medical Scan" 
@@ -151,16 +152,16 @@ const ResultDetailPage = () => {
                   </div>
                 </div>
 
-                <div className="p-8 bg-slate-50 rounded-3xl border border-slate-100/50">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Patient Profile (Report Time)</h3>
+                <div className="p-8 rounded-3xl" style={{ backgroundColor: 'var(--surface-2)', border: '1px solid var(--border)' }}>
+                  <h3 className="text-xs font-bold uppercase tracking-widest mb-4" style={{ color: 'var(--text-light)' }}>Patient Profile (Report Time)</h3>
                   <div className="grid grid-cols-2 gap-6">
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Scan ID</p>
-                      <p className="font-bold text-slate-900">HMS-{result?.id?.toString().padStart(6, '0')}</p>
+                      <p className="font-bold" style={{ color: 'var(--text)' }}>HMS-{result?.id?.toString().padStart(6, '0')}</p>
                     </div>
                     <div>
                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Source Device</p>
-                      <p className="font-bold text-slate-900">Standard {result?.scans?.file_type?.toUpperCase()}</p>
+                      <p className="font-bold" style={{ color: 'var(--text)' }}>Standard {result?.scans?.file_type?.toUpperCase()}</p>
                     </div>
                   </div>
                 </div>
@@ -183,19 +184,19 @@ const ResultDetailPage = () => {
             </div>
 
             {/* Findings and Recommendations */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4 border-t border-slate-50">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
                <div className="space-y-6">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center shadow-lg">
                       <PhotoIcon className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight">AI Findings</h3>
+                    <h3 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>AI Findings</h3>
                   </div>
                   <ul className="space-y-4">
                     {details.findings?.map((f, i) => (
-                      <li key={i} className="flex items-start gap-4 p-4 bg-white rounded-2xl border border-slate-100 shadow-sm border-l-4 border-l-slate-900">
+                      <li key={i} className="flex items-start gap-4 p-4 rounded-2xl shadow-sm border-l-4 border-l-slate-900" style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)', borderLeftWidth: '4px', borderLeftColor: '#0f172a' }}>
                         <span className="text-xs font-bold text-slate-300 transition-colors">{i+1}</span>
-                        <p className="text-slate-600 text-sm leading-relaxed">{f}</p>
+                        <p className="text-sm leading-relaxed" style={{ color: 'var(--text-muted)' }}>{f}</p>
                       </li>
                     ))}
                   </ul>
@@ -206,7 +207,7 @@ const ResultDetailPage = () => {
                     <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-200">
                       <HandThumbUpIcon className="h-5 w-5 text-white" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 tracking-tight">Next Steps</h3>
+                    <h3 className="text-xl font-bold tracking-tight" style={{ color: 'var(--text)' }}>Next Steps</h3>
                   </div>
                   <ul className="space-y-4">
                     {details.recommendations?.map((r, i) => (

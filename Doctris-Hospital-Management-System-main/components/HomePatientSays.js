@@ -29,24 +29,24 @@ const testimonials = [
 
 const HomePatientSays = () => {
   return (
-    <div className="py-20 bg-gradient-to-b from-slate-50 to-white px-6 md:px-12 lg:px-24">
+    <div className="py-20 px-6 md:px-12 lg:px-24 transition-colors duration-300" style={{ backgroundColor: 'var(--bg)' }}>
       <HomeSectionHeader
         tag="Testimonials"
         title="What Our Patients Say"
         description="Real experiences from patients who have used Doctris for their medical needs."
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-4 perspective-1000">
         {testimonials.map((t, i) => (
           <div
             key={i}
-            className="card p-8 bg-white flex flex-col hover:shadow-xl transition-shadow duration-300 fade-in"
+            className="card p-8 flex flex-col hover:shadow-2xl transition-all duration-500 fade-in tilt-3d"
             style={{ animationDelay: `${i * 0.15}s` }}
           >
-            <ChatBubbleLeftIcon className="w-10 h-10 text-blue-100 mb-4" />
+            <ChatBubbleLeftIcon className="w-10 h-10 mb-4" style={{ color: 'var(--border)' }} />
 
-            <p className="text-slate-600 leading-relaxed text-[15px] flex-grow italic mb-6">
-              "{t.text}"
+            <p className="leading-relaxed text-[15px] flex-grow italic mb-6" style={{ color: 'var(--text-muted)' }}>
+              &quot;{t.text}&quot;
             </p>
 
             <div className="flex items-center gap-1 mb-6">
@@ -55,12 +55,12 @@ const HomePatientSays = () => {
               ))}
             </div>
 
-            <div className="flex items-center gap-4 border-t border-slate-100 pt-6">
+            <div className="flex items-center gap-4 pt-6" style={{ borderTop: '1px solid var(--border)' }}>
               <div className="w-11 h-11 rounded-full overflow-hidden border-2 border-blue-100 shrink-0">
                 <img src={t.image} alt={t.name} className="w-full h-full object-cover" />
               </div>
               <div>
-                <p className="font-bold text-slate-900">{t.name}</p>
+                <p className="font-bold" style={{ color: 'var(--text)' }}>{t.name}</p>
                 <p className="text-xs font-medium text-blue-600">{t.role}</p>
               </div>
             </div>

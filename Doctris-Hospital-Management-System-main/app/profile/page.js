@@ -2,11 +2,12 @@
 
 export const dynamic = "force-dynamic";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchPatientProfile, fetchPatientMedicalData } from "@/features/patients/patientsSlice";
+import { fetchDoctors } from "@/features/doctors/doctorsSlice";
 import { addNotification } from "@/features/ui/uiSlice";
-import { Tab } from "@headlessui/react";
+import { Dialog, Transition } from "@headlessui/react";
 import { 
   UserCircleIcon, 
   MapPinIcon, 
@@ -16,7 +17,11 @@ import {
   IdentificationIcon,
   ChatBubbleBottomCenterTextIcon,
   HeartIcon,
-  ArrowPathIcon
+  ArrowPathIcon,
+  PencilSquareIcon,
+  EnvelopeIcon,
+  CalendarDaysIcon,
+  UserGroupIcon
 } from "@heroicons/react/24/outline";
 import { useRouter } from "next/navigation";
 import insforge from "@/utils/insforge";
@@ -30,7 +35,9 @@ const Profile = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { user, patient, medicalData: reduxMedicalData, medicalDataStatus, status } = useSelector((state) => state.patients);
+  const { doctorsList } = useSelector((state) => state.doctors);
 
+  const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -56,6 +63,7 @@ const Profile = () => {
     if (user?.id) {
       if (!patient && status === "idle") dispatch(fetchPatientProfile(user.id));
       if (!reduxMedicalData && medicalDataStatus === "idle") dispatch(fetchPatientMedicalData(user.id));
+      dispatch(fetchDoctors());
     }
   }, [user?.id, dispatch, patient, reduxMedicalData, status, medicalDataStatus]);
 
@@ -150,15 +158,21 @@ const Profile = () => {
 
   const loading = (status === "loading" || medicalDataStatus === "loading") && !patient;
 
+  // Extract Mock/Real Metrics
+  const metrics = {
+    bmi: { value: "22.4", status: "Normal", progress: 65, color: "bg-emerald-500 text-emerald-500" },
+    bp: { value: "118/76", status: "Optimal", progress: 75, color: "bg-cyan-500 text-cyan-500" },
+    heartRate: { value: "88 bpm", status: "Stable", progress: 45, color: "bg-amber-500 text-amber-500" },
+    spO2: { value: "98%", status: "Optimal", progress: 95, color: "bg-emerald-500 text-emerald-500" },
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 py-10 px-4 md:px-20">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_2.5fr] gap-8">
-          <Skeleton className="w-full h-[500px] rounded-3xl" />
-          <div className="space-y-6">
-            <Skeleton className="w-full h-[60px] rounded-2xl" />
-            <Skeleton className="w-full h-[600px] rounded-3xl" />
-          </div>
+        <Skeleton className="w-full h-[120px] rounded-[32px] mb-8" />
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <Skeleton className="w-full h-[600px] rounded-[32px]" />
+          <Skeleton className="w-full h-[600px] rounded-[32px]" />
         </div>
       </div>
     );
@@ -167,240 +181,280 @@ const Profile = () => {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4 md:px-10 lg:px-20">
-      <div className="max-w-7xl mx-auto flex flex-col lg:grid lg:grid-cols-[1fr_2.5fr] gap-8">
+    <div className="min-h-screen py-8 px-4 md:px-10 lg:px-20 transition-colors duration-300" style={{ backgroundColor: 'var(--bg)' }}>
+      <div className="max-w-7xl mx-auto">
         
-        {/* SIDEBAR / LEFT CARD */}
-        <aside className="space-y-6 fade-in">
-          <div className="bg-white rounded-[32px] border border-slate-100 shadow-xl shadow-slate-200/50 overflow-hidden">
-            <div className="h-28 bg-gradient-to-br from-blue-600 to-indigo-600"></div>
-            <div className="px-6 pb-8 text-center -mt-14">
-              <div className="inline-flex h-28 w-28 items-center justify-center rounded-[32px] border-4 border-white bg-blue-100 text-3xl font-black text-blue-600 shadow-2xl overflow-hidden rotate-3 hover:rotate-0 transition-transform duration-300">
-                {patient?.first_name?.[0]?.toUpperCase() || "?"}
+        {/* HEADER SECTION */}
+        <div className="flex flex-col md:flex-row items-center justify-between mb-10 gap-6 animate-fade-in">
+          <div className="flex items-center gap-6">
+            <div className="relative group">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-blue-400 via-blue-600 to-indigo-700 flex items-center justify-center text-white text-3xl font-black shadow-2xl shadow-blue-500/30 border-4 transition-transform group-hover:scale-105 duration-500" style={{ borderColor: 'var(--surface)' }}>
+                {patient?.first_name?.[0]?.toUpperCase()}{patient?.last_name?.[0]?.toUpperCase() || ""}
+                <div className="absolute inset-0 rounded-full bg-white/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity"></div>
               </div>
-              <h2 className="mt-6 text-2xl font-black text-slate-900 leading-tight">
-                {patient ? `${patient.first_name} ${patient.last_name || ""}` : "Patient"}
-              </h2>
-              <p className="text-sm font-bold text-slate-400 mt-1">{user?.email}</p>
+              <div className="absolute -bottom-1 -right-1 w-8 h-8 bg-emerald-500 border-4 rounded-full shadow-lg" style={{ borderColor: 'var(--surface)' }}></div>
             </div>
-            <div className="border-t border-slate-50 px-8 py-8 space-y-5">
-              <div className="flex items-center gap-4 text-sm">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-                  <IdentificationIcon className="h-5 w-5 text-blue-500" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Gender</span>
-                  <span className="font-bold text-slate-700">{patient?.gender || "—"}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="w-10 h-10 rounded-xl bg-cyan-50 flex items-center justify-center shrink-0">
-                  <UserCircleIcon className="h-5 w-5 text-cyan-500" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Age</span>
-                  <span className="font-bold text-slate-700">{medicalData.age || "—"} Yrs</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center shrink-0">
-                  <PhoneIcon className="h-5 w-5 text-indigo-500" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Phone</span>
-                  <span className="font-bold text-slate-700">{patient?.phone_number || "—"}</span>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
-                  <HeartIcon className="h-5 w-5 text-orange-500" />
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Blood Group</span>
-                  <span className="font-bold text-slate-700">{patient?.blood_group || "—"}</span>
-                </div>
+            <div>
+              <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                {patient ? `${patient.first_name} ${patient.last_name || ""}` : "Loading..."}
+              </h1>
+              <div className="flex flex-wrap items-center gap-3 mt-1">
+                <span className="text-slate-400 font-bold text-sm">@{user?.email?.split('@')[0]}</span>
+                <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
+                <span className="text-slate-400 font-bold text-sm">Member since Jan 2026</span>
               </div>
             </div>
           </div>
+          <button 
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2 px-6 py-3 rounded-2xl shadow-sm hover:shadow-md transition-all font-bold active:scale-95"
+            style={{ backgroundColor: 'var(--surface)', borderColor: 'var(--border)', border: '1px solid var(--border)', color: 'var(--text-muted)' }}
+          >
+            <PencilSquareIcon className="h-5 w-5 text-rose-500" />
+            Edit Profile
+          </button>
+        </div>
 
-          <div className="bg-slate-900 rounded-[32px] p-8 text-white shadow-2xl shadow-slate-900/20 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-3xl group-hover:bg-blue-500/20 transition-colors"></div>
-            <h3 className="text-sm font-black text-blue-400 uppercase tracking-widest flex items-center gap-2 mb-4">
-              <InformationCircleIcon className="h-4 w-4" />
-              Intelligence Tip
-            </h3>
-            <p className="text-sm text-slate-300 leading-relaxed font-medium opacity-90">
-              Keep your Medical History updated! Our AI diagnostic tools use this data to provide more accurate scan analysis results.
-            </p>
-          </div>
-        </aside>
-
-        {/* MAIN CONTENT / RIGHT TABS */}
-        <main className="w-full fade-in" style={{ animationDelay: "0.1s" }}>
-          <Tab.Group>
-            <div className="bg-white rounded-[40px] shadow-2xl shadow-slate-200/40 border border-slate-100 flex flex-col min-h-[700px] overflow-hidden">
-              <Tab.List className="flex bg-slate-50/50 p-2 m-4 rounded-3xl border border-slate-100">
-                {["Overview", "Personal Info", "Medical History"].map((tab) => (
-                  <Tab
-                    key={tab}
-                    className={({ selected }) =>
-                      classNames(
-                        "flex-1 px-4 h-14 text-xs font-black uppercase tracking-widest rounded-2xl transition-all outline-none",
-                        selected 
-                          ? "bg-white text-blue-600 shadow-xl shadow-blue-500/5 ring-1 ring-slate-100" 
-                          : "text-slate-400 hover:text-slate-600 hover:bg-white/50"
-                      )
-                    }
-                  >
-                    {tab}
-                  </Tab>
+        {/* MAIN DASHBOARD GRID */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.5fr] gap-8">
+          
+          {/* LEFT COLUMN */}
+          <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
+            {/* PERSONAL INFO CARD */}
+            <div className="dashboard-card p-10">
+              <h3 className="text-[11px] font-black uppercase tracking-[0.2em] mb-8 pb-4" style={{ color: 'var(--text-light)', borderBottom: '1px solid var(--border)' }}>Personal Info</h3>
+              <div className="space-y-7">
+                {[
+                  { label: "Full Name", value: patient ? `${patient.first_name} ${patient.last_name || ""}` : "—" },
+                  { label: "Email", value: user?.email || "—", color: "text-cyan-500" },
+                  { label: "Phone", value: patient?.phone_number || "—" },
+                  { label: "Location", value: patient?.address || "—" },
+                  { label: "Date of Birth", value: patient?.birthday || "—" },
+                  { label: "Blood Group", value: patient?.blood_group || "—" },
+                ].map((info) => (
+                  <div key={info.label} className="group cursor-default">
+                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{info.label}</p>
+                    <p className={classNames("text-sm font-bold text-slate-800 transition-colors group-hover:text-blue-600", info.color)}>{info.value}</p>
+                  </div>
                 ))}
-              </Tab.List>
+              </div>
+            </div>
 
-              <Tab.Panels className="p-8 md:p-12 flex-grow">
-                {/* OVERVIEW TAB */}
-                <Tab.Panel className="fade-in space-y-12">
-                  <section>
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center shadow-lg">
-                        <ChatBubbleBottomCenterTextIcon className="h-6 w-6 text-white" />
-                      </div>
-                      <h3 className="text-2xl font-black text-slate-900 tracking-tight">Introduction</h3>
-                    </div>
-                    <div className="bg-slate-50 p-8 rounded-[32px] border border-slate-100 relative">
-                      <div className="absolute top-4 right-4 text-4xl text-slate-200 font-serif">"</div>
-                      <p className="text-slate-600 leading-relaxed text-lg font-medium italic">
-                        {patient?.introduction || "Explain your current health goals or provide a short bio to help coordinators understand your needs."}
-                      </p>
-                    </div>
-                  </section>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
-                    <div className="p-8 bg-blue-600 rounded-[32px] text-white shadow-xl shadow-blue-500/20 group cursor-pointer" onClick={() => router.push("/results")}>
-                      <h4 className="text-xl font-black mb-2">Recent Scans</h4>
-                      <p className="text-blue-100 text-sm font-medium opacity-80">View and manage your past medical imagery and AI reports.</p>
-                      <div className="mt-8 flex items-center gap-2 text-sm font-black uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                        Explore Dashboard <span>→</span>
+            {/* HEALTH METRICS CARD */}
+            <div className="dashboard-card p-10">
+              <h3 className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Health Metrics</h3>
+              <div className="space-y-8">
+                {[
+                  { label: "BMI", value: metrics.bmi.value, status: metrics.bmi.status, progress: metrics.bmi.progress, color: metrics.bmi.color },
+                  { label: "Blood Pressure", value: metrics.bp.value, status: metrics.bp.status, progress: metrics.bp.progress, color: metrics.bp.color },
+                  { label: "Heart Rate", value: metrics.heartRate.value, status: metrics.heartRate.status, progress: metrics.heartRate.progress, color: metrics.heartRate.color },
+                  { label: "SpO₂", value: metrics.spO2.value, status: metrics.spO2.status, progress: metrics.spO2.progress, color: metrics.spO2.color },
+                ].map((metric) => (
+                  <div key={metric.label}>
+                    <div className="flex justify-between items-end mb-3">
+                      <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{metric.label}</span>
+                      <div className="text-right">
+                        <span className={classNames("text-xs font-black mr-2", metric.color.split(' ')[1])}>{metric.value}</span>
+                        <span className="text-slate-300 text-[10px] font-bold">• {metric.status}</span>
                       </div>
                     </div>
-                    <div className="p-8 bg-indigo-900 rounded-[32px] text-white shadow-xl shadow-indigo-900/20 group cursor-pointer" onClick={() => router.push("/scan-upload")}>
-                      <h4 className="text-xl font-black mb-2">New Diagnosis</h4>
-                      <p className="text-indigo-200 text-sm font-medium opacity-80">Get a second opinion from our medical-grade AI agent instantly.</p>
-                      <div className="mt-8 flex items-center gap-2 text-sm font-black uppercase tracking-widest group-hover:translate-x-2 transition-transform">
-                        Upload Scan <span>→</span>
-                      </div>
+                    <div className="metric-bar">
+                      <div className={classNames("metric-progress", metric.color.split(' ')[0])} style={{ width: `${metric.progress}%` }}></div>
                     </div>
                   </div>
-                </Tab.Panel>
+                ))}
+              </div>
+            </div>
+          </div>
 
-                {/* PERSONAL INFO TAB */}
-                <Tab.Panel className="fade-in">
-                  <div className="max-w-2xl">
-                    <h3 className="text-3xl font-black text-slate-900 mb-8 tracking-tight leading-tight">Personal Details</h3>
-                    
-                    <form className="space-y-6" onSubmit={handleProfileSubmit}>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
-                          <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="John" />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
-                          <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="Doe" />
-                        </div>
+          {/* RIGHT COLUMN */}
+          <div className="space-y-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
+            {/* CURRENT CONDITIONS */}
+            <div className="dashboard-card p-10">
+              <h3 className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Current Conditions</h3>
+              <div className="space-y-4">
+                {[
+                  { name: "Acute Urticaria", meta: "Detected Mar 31, 2026 - Active", color: "bg-rose-500", badge: "HIGH", badgeColor: "text-rose-500 bg-rose-50" },
+                  { name: "Skin Irritation", meta: "Detected Mar 31, 2026 - Active", color: "bg-amber-400", badge: "MED", badgeColor: "text-amber-600 bg-amber-50" },
+                ].map((condition) => (
+                  <div key={condition.name} className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 hover:border-blue-100 hover:bg-slate-50/50 transition-all cursor-default">
+                    <div className="flex items-center gap-4">
+                      <div className={classNames("w-2.5 h-2.5 rounded-full border-2 border-white shadow-sm", condition.color)}></div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">{condition.name}</h4>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{condition.meta}</p>
                       </div>
+                    </div>
+                    <span className={classNames("badge-premium", condition.badgeColor)}>{condition.badge}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gender Identity</label>
-                          <div className="relative">
-                            <select name="gender" value={formData.gender} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white appearance-none">
-                              <option value="">Select Gender</option>
+            {/* CURRENT MEDICATIONS */}
+            <div className="dashboard-card p-10">
+              <h3 className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Current Medications</h3>
+              <div className="space-y-5">
+                {[
+                  { name: "Cetirizine 10mg", dosage: "Once daily at night" },
+                  { name: "Calamine Lotion", dosage: "Apply on affected area" },
+                  { name: "Hydrocortisone Cream", dosage: "2x daily" },
+                ].map((med) => (
+                  <div key={med.name} className="flex items-start gap-4 p-2 rounded-xl hover:bg-slate-50 transition-colors">
+                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-50 to-rose-100 text-rose-500 flex items-center justify-center shrink-0 shadow-sm">
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path></svg>
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm">{med.name}</h4>
+                      <p className="text-[11px] text-slate-400 font-medium tracking-tight">· {med.dosage}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* MY DOCTORS */}
+            <div className="dashboard-card p-10">
+              <h3 className="text-[11px] font-black text-slate-300 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">My Doctors</h3>
+              <div className="space-y-4">
+                {(doctorsList.length > 0 ? doctorsList.slice(0, 3) : [
+                  { first_name: "Amit", last_name: "Desai", specialization: "Pulmonologist", hospital: "Breach Candy Hospital", color: "bg-blue-500" },
+                  { first_name: "Ananya", last_name: "Patel", specialization: "Dermatologist", hospital: "Apollo Hospital, Chennai", color: "bg-rose-500" },
+                ]).map((doc) => (
+                  <div key={doc.first_name || doc.id} className="flex items-center justify-between p-5 rounded-2xl border border-slate-100 hover:border-blue-100 hover:bg-slate-50/50 transition-all">
+                    <div className="flex items-center gap-4">
+                      <div className={classNames("w-12 h-12 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-sm shadow-black/5", doc.color || "bg-emerald-500")}>
+                        {doc.first_name?.[0]}{doc.last_name?.[0]}
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">Dr. {doc.first_name} {doc.last_name}</h4>
+                        <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">{doc.specialization} · {doc.hospital || "General Physician"}</p>
+                      </div>
+                    </div>
+                    <button className="px-5 py-2 bg-white border border-slate-100 rounded-xl text-[10px] font-black uppercase tracking-widest text-slate-500 hover:border-blue-600 hover:text-blue-600 shadow-sm transition-all active:scale-95">Contact</button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* EDIT MODAL */}
+      <Transition show={isEditing} as={Fragment}>
+        <Dialog as="div" className="relative z-50" onClose={() => setIsEditing(false)}>
+          <Transition.Child
+            as={Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity" />
+          </Transition.Child>
+
+          <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+            <div className="flex min-h-full items-center justify-center p-4 sm:p-6 lg:p-8">
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0 scale-95 translate-y-8"
+                enterTo="opacity-100 scale-100 translate-y-0"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100 scale-100 translate-y-0"
+                leaveTo="opacity-0 scale-95 translate-y-8"
+              >
+                <Dialog.Panel className="w-full max-w-4xl transform overflow-hidden rounded-[40px] bg-white p-8 md:p-12 text-left align-middle shadow-2xl transition-all">
+                  <div className="flex justify-between items-start mb-10">
+                    <div>
+                      <Dialog.Title className="text-3xl font-black text-slate-900 tracking-tight">Edit Profile</Dialog.Title>
+                      <p className="text-slate-400 text-sm mt-2 font-medium">Configure your personal and clinical foundation parameters.</p>
+                    </div>
+                    <button onClick={() => setIsEditing(false)} className="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-all active:rotate-90">
+                      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" /></svg>
+                    </button>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                    {/* Form Section 1 */}
+                    <div className="space-y-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
+                          <UserCircleIcon className="h-5 w-5" />
+                        </div>
+                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">General Access</h4>
+                      </div>
+                      
+                      <form className="space-y-6" onSubmit={handleProfileSubmit}>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">First Name</label>
+                            <input type="text" name="first_name" value={formData.first_name} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-1 focus:ring-blue-100" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Last Name</label>
+                            <input type="text" name="last_name" value={formData.last_name} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-1 focus:ring-blue-100" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Gender Identity</label>
+                            <select name="gender" value={formData.gender} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white">
                               <option value="Male">Male</option>
                               <option value="Female">Female</option>
                               <option value="Other">Other</option>
                             </select>
-                            <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">⌄</div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Blood Type</label>
+                            <input type="text" name="blood_group" value={formData.blood_group} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="O+" />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Date of Birth</label>
-                          <input type="date" name="birthday" value={formData.birthday} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" />
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Physical Address</label>
+                          <input type="text" name="address" value={formData.address} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="Street, City, Country" />
                         </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Communication Number</label>
-                          <input type="text" name="phone_number" value={formData.phone_number} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="+1..." />
-                        </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Blood Type</label>
-                          <input type="text" name="blood_group" value={formData.blood_group} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="O+" />
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Physical Address</label>
-                        <input type="text" name="address" value={formData.address} onChange={handleChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="Street, City, Country" />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Patient Profile Bio</label>
-                        <textarea name="introduction" value={formData.introduction} onChange={handleChange} rows={4} className="input-field p-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white resize-none" placeholder="Provide a brief health overview or short biography..." />
-                      </div>
-
-                      <div className="pt-6">
-                        <button type="submit" disabled={savingProfile} className="w-full sm:w-auto h-16 px-12 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                          {savingProfile ? <><ArrowPathIcon className="h-6 w-6 animate-spin"/> Syncing...</> : "Apply Changes"}
+                        <button type="submit" disabled={savingProfile} className="w-full h-15 bg-blue-600 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-blue-500/20 hover:bg-blue-700 transition-all disabled:opacity-50">
+                          {savingProfile ? "Syncing..." : "Update Base Profile"}
                         </button>
-                      </div>
-                    </form>
-                  </div>
-                </Tab.Panel>
+                      </form>
+                    </div>
 
-                {/* MEDICAL HISTORY TAB */}
-                <Tab.Panel className="fade-in">
-                  <div className="max-w-2xl">
-                    <h3 className="text-3xl font-black text-slate-900 mb-2 tracking-tight leading-tight">Clinical Foundation</h3>
-                    <p className="text-slate-500 font-medium mb-10">This high-priority clinical data directly informs our AI diagnostic models.</p>
-                    
-                    <form className="space-y-8" onSubmit={handleMedicalSubmit}>
-                      <div className="space-y-2 max-w-[140px]">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Documented Age</label>
-                        <input type="number" name="age" value={medicalData.age} onChange={handleMedicalChange} className="input-field h-14 px-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white" placeholder="e.g. 30" />
+                    {/* Form Section 2 */}
+                    <div className="space-y-8">
+                       <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                          <BeakerIcon className="h-5 w-5" />
+                        </div>
+                        <h4 className="text-xs font-black text-slate-900 uppercase tracking-widest">Medical Intelligence</h4>
                       </div>
 
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Current Active Symptoms</label>
-                        <textarea name="symptoms" value={medicalData.symptoms} onChange={handleMedicalChange} rows={3} className="input-field p-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white resize-none" placeholder="Describe symptoms e.g. acute chest pain, recurring fatigue..." />
-                        <p className="text-[10px] text-slate-400 font-bold ml-1 uppercase tracking-wider opacity-60">Separate with commas for automated pattern recognition.</p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Specialized Medical Context (JSON Preferred)</label>
-                        <textarea name="medical_history" value={medicalData.medical_history} onChange={handleMedicalChange} rows={6} className="input-field p-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white font-mono text-sm" placeholder='e.g. { "allergies": ["Latex"], "chronic": ["Asthma"] }' />
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Additional Clinician Directives</label>
-                        <textarea name="notes" value={medicalData.notes} onChange={handleMedicalChange} rows={3} className="input-field p-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white resize-none" placeholder="Any vital context for specialists..." />
-                      </div>
-
-                      <div className="pt-6">
-                        <button type="submit" disabled={savingMedical} className="w-full sm:w-auto h-16 px-12 bg-slate-900 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-slate-900/10 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3">
-                          {savingMedical ? <><ArrowPathIcon className="h-6 w-6 animate-spin"/> Encrypting & Saving...</> : "Update Medical Intelligence"}
+                      <form className="space-y-6" onSubmit={handleMedicalSubmit}>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Active Observations & Symptoms</label>
+                          <textarea name="symptoms" value={medicalData.symptoms} onChange={handleMedicalChange} rows={3} className="input-field p-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white resize-none" placeholder="e.g. Recurrent fatigue, skin inflammation..." />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Clinical Context (JSON Structure)</label>
+                          <textarea name="medical_history" value={medicalData.medical_history} onChange={handleMedicalChange} rows={6} className="input-field p-6 rounded-2xl bg-slate-50 border-transparent focus:bg-white font-mono text-xs" placeholder='{"metrics": {"bmi": "22.4"}}' />
+                          <p className="text-[9px] text-slate-400 font-bold ml-1 uppercase tracking-tight opacity-70">Used by AI Models for high-fidelity diagnostics.</p>
+                        </div>
+                        <button type="submit" disabled={savingMedical} className="w-full h-15 bg-slate-900 text-white font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-slate-900/10 hover:bg-black transition-all disabled:opacity-50">
+                          {savingMedical ? "Encrypting..." : "Save Health Intelligence"}
                         </button>
-                      </div>
-                    </form>
+                      </form>
+                    </div>
                   </div>
-                </Tab.Panel>
-              </Tab.Panels>
+                </Dialog.Panel>
+              </Transition.Child>
             </div>
-          </Tab.Group>
-        </main>
-
-      </div>
+          </div>
+        </Dialog>
+      </Transition>
     </div>
   );
 };

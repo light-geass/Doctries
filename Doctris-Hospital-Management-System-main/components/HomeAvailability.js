@@ -26,15 +26,16 @@ const HomeAvailability = () => {
   if (doctorRows.length === 0) return null; // Don't render if no data
 
   return (
-    <div className="bg-white py-20 px-6 md:px-12 lg:px-24">
+    <div className="py-20 px-6 md:px-12 lg:px-24 transition-colors duration-300" style={{ backgroundColor: 'var(--bg)' }}>
       <HomeSectionHeader
         tag="Availability"
         title="Doctor's Schedule"
         description="Check each physician's weekly availability and working hours to plan your consultation."
       />
 
-      <div className="overflow-x-auto mt-8 rounded-2xl border border-slate-200 shadow-lg fade-in">
-        <table className="min-w-full bg-white text-center text-sm text-slate-700">
+      <div className="overflow-x-auto mt-8 rounded-[32px] border border-slate-100 shadow-2xl glass-3d fade-in perspective-1000">
+        <div className="tilt-3d p-1">
+          <table className="min-w-full bg-white/50 backdrop-blur-sm text-center text-sm text-slate-700 rounded-2xl overflow-hidden">
           <thead>
             <tr className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white">
               <th className="py-4 px-6 font-bold text-left rounded-tl-2xl">Physician</th>
@@ -76,6 +77,7 @@ const HomeAvailability = () => {
             ))}
           </tbody>
         </table>
+        </div>
       </div>
     </div>
   );

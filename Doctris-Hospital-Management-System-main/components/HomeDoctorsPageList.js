@@ -3,7 +3,7 @@
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDoctors } from "@/features/doctors/doctorsSlice";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function HomeDoctorsPageList() {
   const router = useRouter();

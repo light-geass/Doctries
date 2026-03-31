@@ -4,7 +4,7 @@ import HomeDoctorsList from './HomeDoctorsList'
 
 const HomeDoctors = () => {
   return (
-    <div className="py-20 bg-slate-50">
+    <div className="py-20 transition-colors duration-300" style={{ backgroundColor: 'var(--bg-page)' }}>
         <HomeSectionHeader 
           title="Meet Our Experts" 
           tag="Certified Specialists"
@@ -15,7 +15,6 @@ const HomeDoctors = () => {
 
         <div className="container mx-auto px-6 lg:px-24 mt-40">
           <div className='relative card overflow-hidden bg-blue-600 min-h-[300px] flex flex-col justify-end p-10 md:p-16'>
-              {/* Background accent */}
               <div className="absolute top-0 right-0 w-1/2 h-full bg-blue-500 -skew-x-12 translate-x-1/4 opacity-20"></div>
               
               <div className='relative z-10 grid grid-cols-1 md:grid-cols-3 gap-12 text-center text-white'>

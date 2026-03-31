@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchDoctors } from "@/features/doctors/doctorsSlice";
 import { useRouter } from "next/navigation";
@@ -23,12 +24,13 @@ export default function HomeDoctorsList() {
     <div className="px-50">
       {doctors.length > 0 ? (
         <>
-          <div className="grid grid-cols-4 gap-10">
+          <div className="grid grid-cols-4 gap-10 perspective-1000">
             {doctors.map((doctor) => (
               <div
                 key={doctor.id}
                 onClick={() => router.push(`/doctors/${doctor.id}`)}
-                className="border-1 border-[#ebf0fd] rounded-xl cursor-pointer hover:shadow-lg transition overflow-hidden"
+                className="rounded-xl cursor-pointer hover:shadow-2xl transition-all overflow-hidden tilt-3d"
+                style={{ backgroundColor: 'var(--surface)', border: '1px solid var(--border)' }}
               >
                 <div className="h-48 bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
                   <span className="text-white text-4xl font-bold">
@@ -36,9 +38,9 @@ export default function HomeDoctorsList() {
                   </span>
                 </div>
                 <div className="px-10 py-6 text-center">
-                  <h2 className="font-semibold text-lg">{doctor.name}</h2>
-                  <p className="text-[12px] text-gray-500">{doctor.specialization}</p>
-                  <p className="text-[11px] text-gray-400 mt-1 truncate">{doctor.location}</p>
+                  <h2 className="font-semibold text-lg" style={{ color: 'var(--text)' }}>{doctor.name}</h2>
+                  <p className="text-[12px]" style={{ color: 'var(--text-muted)' }}>{doctor.specialization}</p>
+                  <p className="text-[11px] mt-1 truncate" style={{ color: 'var(--text-light)' }}>{doctor.location}</p>
                 </div>
               </div>
             ))}
@@ -54,7 +56,7 @@ export default function HomeDoctorsList() {
           </div>
         </>
       ) : (
-        <p className="col-span-4 text-center text-gray-500 py-5">
+        <p className="col-span-4 text-center py-5" style={{ color: 'var(--text-muted)' }}>
           No doctors available
         </p>
       )}
